@@ -160,7 +160,7 @@ class PoseAnalyzer:
         """Dibuja un ángulo en el frame"""
         text = f"{label}: {angle_value:.1f}°"
         cv2.putText(frame, text, position, cv2.FONT_HERSHEY_SIMPLEX, 
-                   0.7, color, 2)
+                    0.7, color, 2)
         return frame
     
     def draw_feedback(self, frame, feedback_list, start_y=30):
@@ -168,17 +168,17 @@ class PoseAnalyzer:
         y = start_y
         for feedback in feedback_list:
             # Determinar color según tipo
-            if "✅" in feedback:
+            if "[OK]" in feedback:
                 color = (0, 255, 0)  # Verde
-            elif "⚠️" in feedback:
+            elif "[WARN]" in feedback:
                 color = (0, 165, 255)  # Naranja
-            elif "❌" in feedback:
+            elif "[ERROR]" in feedback:
                 color = (0, 0, 255)  # Rojo
             else:
                 color = (255, 255, 255)  # Blanco
             
             cv2.putText(frame, feedback, (10, y), cv2.FONT_HERSHEY_SIMPLEX, 
-                       0.65, color, 2)
+                        0.65, color, 2)
             y += 30
         
         return frame
@@ -189,7 +189,7 @@ class SquatAnalyzer:
     
     # Rangos de ángulos correctos
     KNEE_ANGLE_RANGE = (75, 120)
-    BACK_ANGLE_RANGE = (-15, 15)  # ±15° de vertical
+    BACK_ANGLE_RANGE = (-45, 45)  # ±45° (permite inclinación natural en sentadilla profunda)
     
     def __init__(self):
         self.analyzer = PoseAnalyzer()
@@ -213,7 +213,7 @@ class SquatAnalyzer:
         left_shoulder = self.analyzer.get_landmark(landmarks, 'left_shoulder')
         
         if not all([left_hip, left_knee, left_ankle, left_shoulder]):
-            results['feedback'].append("❌ No se detectan puntos suficientes")
+            results['feedback'].append("[ERROR] No se detectan puntos suficientes")
             return results
         
         # Calcular ángulos
@@ -225,20 +225,23 @@ class SquatAnalyzer:
         
         # Validar rodilla
         if knee_angle < self.KNEE_ANGLE_RANGE[0]:
-            results['feedback'].append(f"⚠️ Rodilla insuficiente ({knee_angle:.1f}°). Baja más")
+            results['feedback'].append(f"[WARN] Rodilla insuficiente ({knee_angle:.1f} grados). Baja más")
             results['overall_score'] -= 15
         elif knee_angle > self.KNEE_ANGLE_RANGE[1]:
-            results['feedback'].append(f"⚠️ Flexión excesiva ({knee_angle:.1f}°). Sube un poco")
+            results['feedback'].append(f"[WARN] Flexión excesiva ({knee_angle:.1f} grados). Sube un poco")
             results['overall_score'] -= 10
         else:
-            results['feedback'].append(f"✅ Rodilla correcta ({knee_angle:.1f}°)")
+            results['feedback'].append(f"[OK] Rodilla correcta ({knee_angle:.1f} grados)")
         
         # Validar espalda
-        if abs(back_angle) > self.BACK_ANGLE_RANGE[1]:
-            results['feedback'].append(f"❌ Espalda inclinada ({back_angle:.1f}°). Mantén torso vertical")
-            results['overall_score'] -= 25
+        if abs(back_angle) > 50:
+            results['feedback'].append(f"[ERROR] PELIGRO: Espalda muy inclinada ({back_angle:.1f} grados). Endereza más")
+            results['overall_score'] -= 30
+        elif abs(back_angle) > 35:
+            results['feedback'].append(f"[WARN] Espalda algo inclinada ({back_angle:.1f} grados). Puedes enderezar un poco")
+            results['overall_score'] -= 10
         else:
-            results['feedback'].append(f"✅ Espalda recta ({back_angle:.1f}°)")
+            results['feedback'].append(f"[OK] Espalda en buen rango ({back_angle:.1f} grados)")
         
         # Validar alineación de rodillas
         right_hip = self.analyzer.get_landmark(landmarks, 'right_hip')
@@ -250,7 +253,7 @@ class SquatAnalyzer:
             angle_diff = abs(knee_angle - right_knee_angle)
             
             if angle_diff > 10:
-                results['feedback'].append(f"⚠️ Rodillas desalineadas (diff: {angle_diff:.1f}°)")
+                results['feedback'].append(f"[WARN] Rodillas desalineadas (diff: {angle_diff:.1f} grados)")
                 results['overall_score'] -= 15
         
         results['overall_score'] = max(0, results['overall_score'])
@@ -285,7 +288,7 @@ class PushupAnalyzer:
         left_hip = self.analyzer.get_landmark(landmarks, 'left_hip')
         
         if not all([left_shoulder, left_elbow, left_wrist, left_hip]):
-            results['feedback'].append("❌ No se detectan puntos suficientes")
+            results['feedback'].append("[ERROR] No se detectan puntos suficientes")
             return results
         
         # Calcular ángulos
@@ -297,20 +300,20 @@ class PushupAnalyzer:
         
         # Validar codo
         if elbow_angle < self.ELBOW_ANGLE_RANGE[0]:
-            results['feedback'].append(f"⚠️ Flexión insuficiente ({elbow_angle:.1f}°). Baja más")
+            results['feedback'].append(f"[WARN] Flexión insuficiente ({elbow_angle:.1f} grados ). Baja más")
             results['overall_score'] -= 15
         elif elbow_angle > self.ELBOW_ANGLE_RANGE[1]:
-            results['feedback'].append(f"⚠️ Flexión excesiva ({elbow_angle:.1f}°). Sube un poco")
+            results['feedback'].append(f"[WARN] Flexión excesiva ({elbow_angle:.1f} grados). Sube un poco")
             results['overall_score'] -= 10
         else:
-            results['feedback'].append(f"✅ Codo correcto ({elbow_angle:.1f}°)")
+            results['feedback'].append(f"[OK] Codo correcto ({elbow_angle:.1f} grados)")
         
         # Validar espalda
         if abs(back_angle) > self.BACK_ANGLE_RANGE[1]:
-            results['feedback'].append(f"❌ Espalda inclinada ({back_angle:.1f}°). Mantén alineado")
+            results['feedback'].append(f"[ERROR] Espalda inclinada ({back_angle:.1f} grados). Mantén alineado")
             results['overall_score'] -= 25
         else:
-            results['feedback'].append(f"✅ Espalda alineada")
+            results['feedback'].append(f"[OK] Espalda alineada")
         
         results['overall_score'] = max(0, results['overall_score'])
         return results
@@ -344,7 +347,7 @@ class DeadliftAnalyzer:
         ankle = self.analyzer.get_landmark(landmarks, 'left_ankle')
         
         if not all([shoulder, hip, knee, ankle]):
-            results['feedback'].append("❌ No se detectan puntos suficientes")
+            results['feedback'].append("[ERROR] No se detectan puntos suficientes")
             return results
         
         # Calcular ángulos
@@ -356,20 +359,20 @@ class DeadliftAnalyzer:
         
         # Validar espalda (crítico en peso muerto)
         if abs(back_angle) > self.BACK_ANGLE_RANGE[1]:
-            results['feedback'].append(f"❌ PELIGRO: Espalda inclinada ({back_angle:.1f}°). Riesgo de lesión")
+            results['feedback'].append(f"[ERROR] PELIGRO: Espalda inclinada ({back_angle:.1f} grados). Riesgo de lesión")
             results['overall_score'] -= 40
         else:
-            results['feedback'].append(f"✅ Espalda neutra")
+            results['feedback'].append(f"[OK] Espalda neutra")
         
         # Validar rodilla
         if knee_angle < self.KNEE_ANGLE_RANGE[0]:
-            results['feedback'].append(f"⚠️ Rodilla muy flexionada ({knee_angle:.1f}°)")
+            results['feedback'].append(f"[WARN] Rodilla muy flexionada ({knee_angle:.1f} grados)")
             results['overall_score'] -= 15
         elif knee_angle > self.KNEE_ANGLE_RANGE[1]:
-            results['feedback'].append(f"⚠️ Rodilla muy extendida ({knee_angle:.1f}°)")
+            results['feedback'].append(f"[WARN] Rodilla muy extendida ({knee_angle:.1f} grados)")
             results['overall_score'] -= 10
         else:
-            results['feedback'].append(f"✅ Rodilla correcta ({knee_angle:.1f}°)")
+            results['feedback'].append(f"[OK] Rodilla correcta ({knee_angle:.1f} grados)")
         
         results['overall_score'] = max(0, results['overall_score'])
         return results
