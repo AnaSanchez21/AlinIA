@@ -23,13 +23,13 @@ IMAGE_PATH = "pose.png"  #
 OUTPUT_PATH = "resultado.jpg"
 
 print("=" * 60)
-print("🏃 DETECTOR DE POSE - DÍA 2")
+print(" DETECTOR DE POSE - DÍA 2")
 print("=" * 60)
 
 # ====== PASO 1: CREAR ANALIZADOR ======
 print("\n Inicializando MediaPipe Pose...")
 analyzer = PoseAnalyzer()
-print("   ✓ Listo")
+print("   [OK] Listo")
 
 # ====== PASO 2: CARGAR IMAGEN ======
 print("\n Cargando imagen...")
@@ -37,13 +37,13 @@ frame = cv2.imread(IMAGE_PATH)
 
 if frame is None:
     print(f"   [ERROR] Error: No se pudo cargar '{IMAGE_PATH}'")
-    print(f"   💡 Verifica:")
-    print(f"      • El archivo existe en esta carpeta")
-    print(f"      • Se llama exactamente así (mayúsculas/minúsculas importa)")
-    print(f"      • Es JPG o PNG")
+    print(f"   [INFO] Verifica:")
+    print(f"      - El archivo existe en esta carpeta")
+    print(f"      - Se llama exactamente así (mayúsculas/minúsculas importa)")
+    print(f"      - Es JPG o PNG")
     exit()
 
-print(f"   ✓ Imagen cargada: {frame.shape}")
+print(f"   [OK] Imagen cargada: {frame.shape}")
 print(f"     Tamaño: {frame.shape[1]}x{frame.shape[0]} píxeles")
 
 # ====== PASO 3: DETECTAR POSE ======
@@ -52,16 +52,16 @@ results = analyzer.detect_pose(frame)
 
 if results.pose_landmarks is None:
     print("   [ERROR] No se detectó pose")
-    print("   💡 Razones comunes:")
-    print("      • Persona de espaldas (difícil)")
-    print("      • Iluminación muy oscura")
-    print("      • Cuerpo parcialmente cortado")
-    print("   → Intenta con otra imagen")
+    print("   [INFO] Razones comunes:")
+    print("      - Persona de espaldas (difícil)")
+    print("      - Iluminación muy oscura")
+    print("      - Cuerpo parcialmente cortado")
+    print("   -> Intenta con otra imagen")
     exit()
 
 landmarks = results.pose_landmarks.landmark
-print(f"   ✓ ¡Pose detectada!")
-print(f"   ✓ {len(landmarks)} puntos detectados")
+print(f"   [OK] ¡Pose detectada!")
+print(f"   [OK] {len(landmarks)} puntos detectados")
 
 # ====== PASO 4: ANALIZAR PUNTOS ======
 print("\n Analizando puntos detectados...")
@@ -70,18 +70,18 @@ for i, lm in enumerate(landmarks):
     if lm.visibility > 0.5:  # Punto visible
         visible_count += 1
 
-print(f"   ✓ Puntos visibles: {visible_count}/{len(landmarks)}")
-print(f"   ✓ Confianza promedio: {sum(lm.visibility for lm in landmarks)/len(landmarks):.1%}")
+print(f"   [OK] Puntos visibles: {visible_count}/{len(landmarks)}")
+print(f"   [OK] Confianza promedio: {sum(lm.visibility for lm in landmarks)/len(landmarks):.1%}")
 
 # ====== PASO 5: DIBUJAR SKELETON ======
 print("\n Dibujando skeleton...")
 frame = analyzer.draw_skeleton(frame, landmarks)
-print("   ✓ Skeleton dibujado")
+print("   [OK] Skeleton dibujado")
 
 # ====== PASO 6: GUARDAR RESULTADO ======
 print("\n Guardando resultado...")
 cv2.imwrite(OUTPUT_PATH, frame)
-print(f"   ✓ Guardado en: {OUTPUT_PATH}")
+print(f"   [OK] Guardado en: {OUTPUT_PATH}")
 
 print("\n" + "=" * 60)
 print("[OK] ÉXITO - Abre resultado.jpg para ver el skeleton")

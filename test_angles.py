@@ -4,9 +4,9 @@ DÍA 3: Cálculo de Ángulos Corporales
 ===============================================
 
 Calcula ángulos reales de tu cuerpo en ejercicios:
-  • Ángulo de rodilla (sentadilla)
-  • Ángulo de espalda (inclinación)
-  • Ángulo de codo (flexión)
+  - Ángulo de rodilla (sentadilla)
+  - Ángulo de espalda (inclinación)
+  - Ángulo de codo (flexión)
 
 Duración: ~2 minutos por imagen
 """
@@ -17,7 +17,7 @@ from math import degrees, acos
 from pose_analyzer import PoseAnalyzer
 
 # ====== CONFIGURACIÓN ======
-IMAGE_PATH = "tu_foto.jpg"  # 👈 CAMBIA ESTO
+IMAGE_PATH = "tu_foto.jpg"  #  CAMBIA ESTO
 OUTPUT_PATH = "resultado_angulos.jpg"
 
 print("=" * 70)
@@ -33,7 +33,7 @@ if frame is None:
     print(f"   [ERROR] No se pudo cargar '{IMAGE_PATH}'")
     exit()
 
-print(f"   ✓ Imagen cargada")
+print(f"   [OK] Imagen cargada")
 
 results = analyzer.detect_pose(frame)
 if results.pose_landmarks is None:
@@ -41,7 +41,7 @@ if results.pose_landmarks is None:
     exit()
 
 landmarks = results.pose_landmarks.landmark
-print(f"   ✓ Pose detectada - 33 puntos")
+print(f"   [OK] Pose detectada - 33 puntos")
 
 # ====== PASO 2: OBTENER PUNTOS CLAVE ======
 print("\n Extrayendo puntos clave...")
@@ -64,7 +64,7 @@ right_elbow = (landmarks[14].x, landmarks[14].y, landmarks[14].z)
 left_wrist = (landmarks[15].x, landmarks[15].y, landmarks[15].z)
 right_wrist = (landmarks[16].x, landmarks[16].y, landmarks[16].z)
 
-print(f"   ✓ Puntos extraídos")
+print(f"   [OK] Puntos extraídos")
 
 # ====== PASO 3: CALCULAR ÁNGULOS ======
 print("\n Calculando ángulos...")
@@ -87,24 +87,24 @@ back_angle = degrees(np.arctan2(abs(dx_spine), abs(dy_spine)))
 # Ángulo entre espalda y pierna
 hip_angle = analyzer.calculate_angle(left_shoulder, left_hip, left_knee)
 
-print(f"   ✓ Ángulos calculados")
+print(f"   [OK] Ángulos calculados")
 
 # ====== PASO 4: MOSTRAR RESULTADOS ======
 print("\n RESULTADOS:")
 print("-" * 70)
 print(f"\n  RODILLAS:")
-print(f"    • Rodilla izquierda:  {left_knee_angle:6.1f} grados")
-print(f"    • Rodilla derecha:    {right_knee_angle:6.1f} grados")
-print(f"    • Diferencia:         {abs(left_knee_angle - right_knee_angle):6.1f} grados")
+print(f"    - Rodilla izquierda:  {left_knee_angle:6.1f} grados")
+print(f"    - Rodilla derecha:    {right_knee_angle:6.1f} grados")
+print(f"    - Diferencia:         {abs(left_knee_angle - right_knee_angle):6.1f} grados")
 
 print(f"\n  CODOS:")
-print(f"    • Codo izquierdo:     {left_elbow_angle:6.1f} grados")
-print(f"    • Codo derecho:       {right_elbow_angle:6.1f} grados")
-print(f"    • Diferencia:         {abs(left_elbow_angle - right_elbow_angle):6.1f} grados")
+print(f"    - Codo izquierdo:     {left_elbow_angle:6.1f} grados")
+print(f"    - Codo derecho:       {right_elbow_angle:6.1f} grados")
+print(f"    - Diferencia:         {abs(left_elbow_angle - right_elbow_angle):6.1f} grados")
 
 print(f"\n  POSTURA:")
-print(f"    • Inclinación espalda: {back_angle:6.1f} grados  (0° = vertical, 90° = horizontal)")
-print(f"    • Ángulo cadera:       {hip_angle:6.1f} grados")
+print(f"    - Inclinación espalda: {back_angle:6.1f} grados  (0 grados = vertical, 90 grados = horizontal)")
+print(f"    - Ángulo cadera:       {hip_angle:6.1f} grados")
 
 print("-" * 70)
 
@@ -114,23 +114,23 @@ print("-" * 70)
 
 # Rodillas
 if abs(left_knee_angle - right_knee_angle) > 10:
-    print(f"   [WARN] Rodillas desalineadas (diferencia: {abs(left_knee_angle - right_knee_angle):.1f}°)")
+    print(f"   [WARN] Rodillas desalineadas (diferencia: {abs(left_knee_angle - right_knee_angle):.1f} grados)")
 else:
-    print(f"   ✓ Rodillas alineadas")
+    print(f"   [OK] Rodillas alineadas")
 
 # Espalda
 if back_angle < 5:
-    print(f"   ✓ Espalda vertical (buena postura)")
+    print(f"   [OK] Espalda vertical (buena postura)")
 elif back_angle < 20:
     print(f"   [WARN] Espalda ligeramente inclinada ({back_angle:.1f} grados)")
 else:
-    print(f"   [ERROR] Espalda muy inclinada ({back_angle:.1f}°) - Riesgo de lesión")
+    print(f"   [ERROR] Espalda muy inclinada ({back_angle:.1f} grados) - Riesgo de lesión")
 
 # Codos
 if abs(left_elbow_angle - right_elbow_angle) > 15:
     print(f"   [WARN] Codos desalineados")
 else:
-    print(f"   ✓ Codos alineados")
+    print(f"   [OK] Codos alineados")
 
 print("-" * 70)
 
@@ -166,20 +166,20 @@ cv2.circle(frame, (int(left_hip[0]*w), int(left_hip[1]*h)), 8, (0, 0, 255), -1)
 cv2.circle(frame, (int(left_shoulder[0]*w), int(left_shoulder[1]*h)), 8, (0, 0, 255), -1)
 
 cv2.imwrite(OUTPUT_PATH, frame)
-print(f"   ✓ Guardado en: {OUTPUT_PATH}")
+print(f"   [OK] Guardado en: {OUTPUT_PATH}")
 
 print("\n" + "=" * 70)
 print("[OK] ÉXITO - Abre resultado_angulos.jpg para ver ángulos dibujados")
 print("=" * 70)
 
 # ====== INFORMACIÓN ÚTIL ======
-print("\n💡 RANGOS TÍPICOS SEGÚN EJERCICIO:")
-print("   • Sentadilla:")
-print("     - Rodilla: 75-110°")
-print("     - Espalda: ±15°")
-print("   • Flexión:")
-print("     - Codo: 80-120°")
-print("     - Espalda: ±10°")
-print("   • Peso muerto:")
-print("     - Espalda: ±5° (muy importante)")
-print("     - Rodilla: 20-80°")
+print("\n[INFO] RANGOS TÍPICOS SEGÚN EJERCICIO:")
+print("   - Sentadilla:")
+print("     - Rodilla: 75-110 grados")
+print("     - Espalda: +/-15 grados")
+print("   - Flexión:")
+print("     - Codo: 80-120 grados")
+print("     - Espalda: +/-10 grados")
+print("   - Peso muerto:")
+print("     - Espalda: +/-5 grados (muy importante)")
+print("     - Rodilla: 20-80 grados")

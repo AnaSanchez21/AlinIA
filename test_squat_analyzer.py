@@ -4,9 +4,9 @@ DÍA 4: Analizador de Sentadillas
 ===============================================
 
 Valida forma de sentadilla:
-  • Rodilla: 75-120° (correcta)
-  • Espalda: ±15° (vertical)
-  • Rodillas alineadas: <10° diferencia
+  - Rodilla: 75-120 grados (correcta)
+  - Espalda: +/-15 grados (vertical)
+  - Rodillas alineadas: <10 grados diferencia
 
 Genera FEEDBACK automático como un coach:
   [OK] Rodilla correcta
@@ -33,7 +33,7 @@ print("=" * 70)
 # ====== PASO 1: CREAR ANALIZADOR ======
 print("\n Inicializando analizador...")
 squat = SquatAnalyzer()
-print("   ✓ Listo")
+print("   [OK] Listo")
 
 # ====== PASO 2: CARGAR IMAGEN ======
 print("\n Cargando imagen...")
@@ -41,10 +41,10 @@ frame = cv2.imread(IMAGE_PATH)
 
 if frame is None:
     print(f"   [ERROR] Error: No se pudo cargar '{IMAGE_PATH}'")
-    print(f"   💡 Verifica que sea una sentadilla y que exista el archivo")
+    print(f"   [INFO] Verifica que sea una sentadilla y que exista el archivo")
     exit()
 
-print(f"   ✓ Imagen cargada: {frame.shape}")
+print(f"   [OK] Imagen cargada: {frame.shape}")
 
 # ====== PASO 3: ANALIZAR SENTADILLA ======
 print("\n Analizando forma de sentadilla...")
@@ -54,24 +54,24 @@ results = squat.analyzer.detect_pose(frame)
 
 if results.pose_landmarks is None:
     print("   [ERROR] Pose NO detectada")
-    print("   💡 Intenta con imagen más clara")
+    print("   [INFO] Intenta con imagen más clara")
     exit()
 
 landmarks = results.pose_landmarks.landmark
-print("   ✓ Pose detectada")
+print("   [OK] Pose detectada")
 
 # ANALIZAR (esto es lo nuevo hoy)
 analysis = squat.analyze(frame, landmarks)
 
-print("   ✓ Análisis completado")
+print("   [OK] Análisis completado")
 
 # ====== PASO 4: MOSTRAR RESULTADOS ======
 print("\n RESULTADOS DETALLADOS:")
 print("-" * 70)
 
 print(f"\n   ÁNGULOS MEDIDOS:")
-print(f"    • Rodilla izquierda:  {analysis['knee_angle']:.1f} grados")
-print(f"    • Espalda:            {analysis['back_angle']:.1f} grados")
+print(f"    - Rodilla izquierda:  {analysis['knee_angle']:.1f} grados")
+print(f"    - Espalda:            {analysis['back_angle']:.1f} grados")
 
 print(f"\n   FEEDBACK:")
 for msg in analysis['feedback']:
@@ -105,17 +105,17 @@ print(f"\n  {color} {verdict}")
 print(f"     Score: {score:.0f}/100")
 
 # Recomendaciones específicas
-print(f"\n  💡 RECOMENDACIONES:")
+print(f"\n  [INFO] RECOMENDACIONES:")
 if score < 70:
-    print(f"     • Mira un video tutorial de sentadilla correcta")
-    print(f"     • Practica sin peso primero")
-    print(f"     • Pide feedback a un entrenador")
+    print(f"     - Mira un video tutorial de sentadilla correcta")
+    print(f"     - Practica sin peso primero")
+    print(f"     - Pide feedback a un entrenador")
 elif score < 90:
-    print(f"     • Casi perfecto, fine-tuning de técnica")
-    print(f"     • Lee el feedback arriba")
+    print(f"     - Casi perfecto, fine-tuning de técnica")
+    print(f"     - Lee el feedback arriba")
 else:
-    print(f"     • ¡Forma excelente! Mantén así")
-    print(f"     • Aumenta peso/repeticiones")
+    print(f"     - ¡Forma excelente! Mantén así")
+    print(f"     - Aumenta peso/repeticiones")
 
 print("-" * 70)
 
@@ -163,18 +163,18 @@ cv2.putText(frame, verdict, (10, h - 40),
             cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0, 255, 0) if score >= 70 else (0, 0, 255), 2)
 
 cv2.imwrite(OUTPUT_PATH, frame)
-print(f"   ✓ Guardado en: {OUTPUT_PATH}")
+print(f"   [OK] Guardado en: {OUTPUT_PATH}")
 
 # ====== PASO 7: INFORMACIÓN ÚTIL ======
 print("\n" + "=" * 70)
 print("[OK] ÉXITO - Abre resultado_squat.jpg para ver análisis visual")
 print("=" * 70)
 
-print("\n💡 REFERENCIA RÁPIDA DE RANGOS:")
+print("\n[INFO] REFERENCIA RÁPIDA DE RANGOS:")
 print("   SENTADILLA:")
-print("   • Rodilla: 75-120° (< 75 = baja más, > 120 = sube)")
-print("   • Espalda: ±15° (0° = vertical, > 15° = inclínate menos)")
-print("   • Rodillas alineadas: diferencia < 10°")
+print("   - Rodilla: 75-120 grados (< 75 = baja más, > 120 = sube)")
+print("   - Espalda: +/-15 grados (0 grados = vertical, > 15 grados = inclínate menos)")
+print("   - Rodillas alineadas: diferencia < 10 grados")
 
 
 

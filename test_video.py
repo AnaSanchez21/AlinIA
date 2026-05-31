@@ -4,12 +4,12 @@ DÍA 5: Procesamiento de Video en Tiempo Real
 ===============================================
 
 Procesa video completo frame-by-frame:
-  • Detecta pose en cada frame
-  • Calcula ángulos por frame
-  • Valida forma (SquatAnalyzer)
-  • Acumula scores
-  • Genera gráfico de evolución
-  • Exporta video procesado
+  - Detecta pose en cada frame
+  - Calcula ángulos por frame
+  - Valida forma (SquatAnalyzer)
+  - Acumula scores
+  - Genera gráfico de evolución
+  - Exporta video procesado
 
 Duración: 10 segundos video = ~30-60 segundos procesamiento (sin GPU)
 
