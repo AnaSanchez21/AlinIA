@@ -161,7 +161,7 @@ class PoseAnalyzer:
                 if p1 and p2 and p1[3] > 0.5 and p2[3] > 0.5:
                     x1, y1 = int(p1[0] * w), int(p1[1] * h)
                     x2, y2 = int(p2[0] * w), int(p2[1] * h)
-                    cv2.line(frame, (x1, y1), (x2, y2), (0, 255, 0), 2)
+                    cv2.line(frame, (x1, y1), (x2, y2), (255, 255, 0), 2)
             except Exception:
                 continue
 
@@ -170,7 +170,7 @@ class PoseAnalyzer:
                 lm = landmarks[idx]
                 if lm.visibility > 0.5:
                     x, y = int(lm.x * w), int(lm.y * h)
-                    cv2.circle(frame, (x, y), 5, (0, 0, 255), -1)
+                    cv2.circle(frame, (x, y), 6, (204, 163, 0), -1)
 
         return frame
 

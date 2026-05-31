@@ -23,34 +23,238 @@ st.set_page_config(
 
 st.markdown("""
 <style>
-    .feedback-card {
-        padding: 10px 14px;
-        margin: 6px 0;
-        border-radius: 8px;
-        display: flex;
-        align-items: center;
-        gap: 10px;
-    }
-    .badge {
-        padding: 2px 10px;
-        border-radius: 4px;
-        font-size: 0.75em;
-        font-weight: bold;
-        color: white;
-        white-space: nowrap;
-        min-width: 54px;
-        text-align: center;
-    }
-    .badge-ok    { background: #2e7d32; }
-    .badge-warn  { background: #e65100; }
-    .badge-error { background: #b71c1c; }
-    .badge-info  { background: #1565c0; }
-    .card-ok     { background: #f1f8f1; border-left: 4px solid #4caf50; }
-    .card-warn   { background: #fff8f0; border-left: 4px solid #ff6d00; }
-    .card-error  { background: #fff5f5; border-left: 4px solid #e53935; }
-    .card-info   { background: #f0f4ff; border-left: 4px solid #1976d2; }
-    .card-msg    { font-size: 0.93em; color: #333; flex: 1; }
-    .freq-tag    { font-size: 0.75em; color: #888; margin-left: auto; white-space: nowrap; }
+/* ===== BASE / FONDO ===== */
+.stApp { background-color: #050C22 !important; }
+.main .block-container { padding-top: 1.5rem; max-width: 1200px; }
+
+/* ===== SIDEBAR ===== */
+[data-testid="stSidebar"] {
+    background: linear-gradient(180deg, #0A1A3F 0%, #111933 100%) !important;
+    border-right: 1px solid #00A3CC44;
+}
+[data-testid="stSidebar"] * { color: #FAFAFA; }
+[data-testid="stSidebar"] .block-container { padding-top: 1rem; }
+
+/* ===== TEXTO GLOBAL ===== */
+p, li, span, label, .stMarkdown { color: #FAFAFA; }
+h1 { color: #00FFFF !important; letter-spacing: 2px; }
+h2 { color: #00FFFF !important; }
+h3 { color: #00A3CC !important; }
+
+/* ===== CABECERA LOGO ===== */
+.alinia-header {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    padding: 1rem 0 0.5rem 0;
+    margin-bottom: 0.5rem;
+}
+.alinia-logo {
+    animation: logo-pulse 3s ease-in-out infinite;
+}
+@keyframes logo-pulse {
+    0%, 100% { filter: drop-shadow(0 0 6px #00FFFF88); }
+    50% { filter: drop-shadow(0 0 18px #00FFFFcc); }
+}
+.alinia-title {
+    font-size: 3.2em;
+    font-weight: 900;
+    letter-spacing: 3px;
+    background: linear-gradient(135deg, #00FFFF, #00A3CC);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    line-height: 1;
+}
+.alinia-subtitle {
+    font-size: 0.95em;
+    color: #B0B0B0;
+    letter-spacing: 1px;
+    margin-top: 4px;
+}
+
+/* ===== TABS ===== */
+.stTabs [data-baseweb="tab-list"] {
+    background: #111933;
+    border-radius: 12px;
+    padding: 4px;
+    gap: 4px;
+    border: 1px solid #00A3CC33;
+}
+.stTabs [data-baseweb="tab"] {
+    color: #B0B0B0 !important;
+    border-radius: 8px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    padding: 8px 20px;
+    transition: all 0.3s;
+}
+.stTabs [data-baseweb="tab"]:hover { color: #00FFFF !important; }
+.stTabs [aria-selected="true"] {
+    background: linear-gradient(135deg, #00FFFF22, #00A3CC22) !important;
+    color: #00FFFF !important;
+    border-bottom: 2px solid #00FFFF !important;
+}
+
+/* ===== BOTONES ===== */
+.stButton > button {
+    background: linear-gradient(135deg, #00FFFF, #00A3CC) !important;
+    color: #050C22 !important;
+    font-weight: 800 !important;
+    border: none !important;
+    border-radius: 10px !important;
+    padding: 0.5rem 1.5rem !important;
+    letter-spacing: 0.5px;
+    transition: all 0.3s !important;
+    box-shadow: 0 0 12px #00FFFF44 !important;
+}
+.stButton > button:hover {
+    box-shadow: 0 0 25px #00FFFFaa !important;
+    transform: translateY(-2px) !important;
+}
+
+/* ===== FILE UPLOADER ===== */
+[data-testid="stFileUploader"] {
+    background: #111933 !important;
+    border: 2px dashed #00A3CC !important;
+    border-radius: 14px !important;
+    padding: 1rem !important;
+    animation: border-pulse 3s ease-in-out infinite;
+}
+@keyframes border-pulse {
+    0%, 100% { border-color: #00A3CC; box-shadow: 0 0 6px #00A3CC33; }
+    50% { border-color: #00FFFF; box-shadow: 0 0 16px #00FFFF44; }
+}
+[data-testid="stFileUploader"] * { color: #B0B0B0 !important; }
+
+/* ===== METRICS ===== */
+[data-testid="stMetric"] {
+    background: #111933 !important;
+    border-left: 3px solid #00FFFF !important;
+    border-radius: 12px !important;
+    padding: 1rem !important;
+    box-shadow: 0 0 10px #00FFFF22;
+}
+[data-testid="stMetricValue"] {
+    color: #00FFFF !important;
+    font-size: 1.8em !important;
+    font-weight: 900 !important;
+}
+[data-testid="stMetricLabel"] { color: #B0B0B0 !important; }
+
+/* ===== PROGRESS BAR ===== */
+.stProgress > div > div > div > div {
+    background: linear-gradient(90deg, #00A3CC, #00FFFF) !important;
+    box-shadow: 0 0 8px #00FFFF66;
+}
+
+/* ===== SELECT / INPUT ===== */
+.stSelectbox [data-baseweb="select"] > div,
+[data-testid="stSelectbox"] > div > div {
+    background: #111933 !important;
+    border: 1px solid #00A3CC55 !important;
+    color: #FAFAFA !important;
+    border-radius: 8px !important;
+}
+
+/* ===== EXPANDER ===== */
+.streamlit-expanderHeader {
+    background: #111933 !important;
+    color: #00A3CC !important;
+    border-radius: 8px !important;
+    border: 1px solid #00A3CC33 !important;
+}
+.streamlit-expanderContent {
+    background: #0A1A3F !important;
+    border: 1px solid #00A3CC22 !important;
+    border-top: none !important;
+}
+
+/* ===== ALERTS / INFO / WARNING ===== */
+.stAlert {
+    background: #111933 !important;
+    border-radius: 10px !important;
+    border-left: 4px solid #00A3CC !important;
+}
+
+/* ===== SEPARADORES ===== */
+hr { border-color: #00A3CC33 !important; }
+
+/* ===== DIVIDER DE SECCIONES ===== */
+.section-divider {
+    border: none;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, #00A3CC, transparent);
+    margin: 2rem 0;
+}
+
+/* ===== FEEDBACK CARDS ===== */
+.feedback-card {
+    padding: 11px 16px;
+    margin: 7px 0;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    transition: transform 0.2s, box-shadow 0.2s;
+    cursor: default;
+}
+.feedback-card:hover { transform: translateX(4px); }
+.badge {
+    padding: 3px 12px;
+    border-radius: 6px;
+    font-size: 0.72em;
+    font-weight: 800;
+    color: #050C22;
+    white-space: nowrap;
+    min-width: 58px;
+    text-align: center;
+    letter-spacing: 0.5px;
+}
+.badge-ok    { background: #00FFFF; box-shadow: 0 0 8px #00FFFF66; }
+.badge-warn  { background: #FFB300; box-shadow: 0 0 8px #FFB30066; }
+.badge-error { background: #FF4444; box-shadow: 0 0 8px #FF444466; }
+.badge-info  { background: #00A3CC; box-shadow: 0 0 8px #00A3CC66; }
+.card-ok     { background: #0A2A1A; border-left: 4px solid #00FFFF; box-shadow: 0 0 8px #00FFFF11; }
+.card-warn   { background: #2A1F0A; border-left: 4px solid #FFB300; box-shadow: 0 0 8px #FFB30011; }
+.card-error  { background: #2A0A0A; border-left: 4px solid #FF4444; box-shadow: 0 0 8px #FF444411; }
+.card-info   { background: #0A1A2A; border-left: 4px solid #00A3CC; box-shadow: 0 0 8px #00A3CC11; }
+.card-msg    { font-size: 0.92em; color: #FAFAFA; flex: 1; }
+.freq-tag    { font-size: 0.73em; color: #B0B0B0; margin-left: auto; white-space: nowrap;
+               background: #050C22; padding: 2px 8px; border-radius: 4px; }
+
+/* ===== SECCION HEADER ===== */
+.view-header {
+    background: linear-gradient(135deg, #111933, #0A1A3F);
+    border: 1px solid #00A3CC44;
+    border-radius: 14px;
+    padding: 1rem 1.5rem;
+    margin: 1rem 0;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+.view-badge {
+    background: linear-gradient(135deg, #00FFFF, #00A3CC);
+    color: #050C22;
+    font-weight: 900;
+    padding: 6px 16px;
+    border-radius: 8px;
+    font-size: 0.85em;
+    letter-spacing: 1px;
+    white-space: nowrap;
+}
+.view-desc { color: #B0B0B0; font-size: 0.88em; }
+
+/* ===== VIDEO PLAYER ===== */
+video { border-radius: 12px !important; box-shadow: 0 0 20px #00FFFF22 !important; }
+img { border-radius: 12px !important; }
+
+/* ===== DATAFRAME / TABLE ===== */
+.stDataFrame { border: 1px solid #00A3CC33 !important; border-radius: 10px !important; }
+
+/* ===== SIDEBAR SELECT ===== */
+[data-testid="stSidebar"] .stSelectbox label { color: #00A3CC !important; font-weight: 600; }
 </style>
 """, unsafe_allow_html=True)
 
@@ -235,36 +439,156 @@ exercise_map = {
 }
 selected_exercise = exercise_map[exercise_type]
 
-with st.sidebar.expander("Guia de ejercicio"):
-    if selected_exercise == "squat":
-        st.markdown("""
-        **Sentadilla Correcta**
-        - Rodillas: 75-120 grados
-        - Espalda: inclinacion moderada (+/-45 grados)
-        - Rodillas alineadas: sin rotacion
-        - Peso en talones
-        """)
-    elif selected_exercise == "pushup":
-        st.markdown("""
-        **Flexion Correcta**
-        - Codo: 70-120 grados
-        - Cuerpo recto en plank (alineacion > 155 grados)
-        - Cabeza alineada con espalda
-        - Manos a ancho de hombros
-        """)
-    else:
-        st.markdown("""
-        **Peso Muerto Correcto**
-        - Espalda neutra (no redondeada) - critico
-        - Bisagra de cadera: 60-170 grados
-        - Rodilla: 20-80 grados en fase baja
-        - Pecho elevado, peso cercano al cuerpo
-        """)
+# ── Recuadro lateral con guia del ejercicio ──
+_guide_data = {
+    "squat": {
+        "titulo": "Sentadilla",
+        "icono": "SQUAT",
+        "items": [
+            ("Rodilla", "75 - 120 grados"),
+            ("Espalda", "+/-45 grados"),
+            ("Pies", "Ancho de hombros"),
+            ("Rodillas", "Alineadas con pie"),
+        ],
+        "alerta": "Riesgo: valgus de rodilla",
+        "vistas": "Perfil + Frente",
+    },
+    "pushup": {
+        "titulo": "Flexion",
+        "icono": "PUSH-UP",
+        "items": [
+            ("Codo", "70 - 120 grados"),
+            ("Alineacion", "> 155 grados"),
+            ("Manos", "Ancho de hombros"),
+            ("Hombros", "Nivelados"),
+        ],
+        "alerta": "Riesgo: cadera hundida",
+        "vistas": "Perfil + Frente",
+    },
+    "deadlift": {
+        "titulo": "Peso Muerto",
+        "icono": "DEADLIFT",
+        "items": [
+            ("Bisagra cadera", "60 - 170 grados"),
+            ("Rodilla (baja)", "20 - 80 grados"),
+            ("Espalda", "Neutra — critico"),
+            ("Pies", "Ancho de caderas"),
+        ],
+        "alerta": "Riesgo: espalda redondeada",
+        "vistas": "Perfil + Frente",
+    },
+}
+
+_g = _guide_data[selected_exercise]
+_items_html = "".join(
+    f'''<div style="display:flex;justify-content:space-between;padding:5px 0;
+        border-bottom:1px solid #00A3CC22;">
+        <span style="color:#B0B0B0;font-size:0.82em;">{k}</span>
+        <span style="color:#00FFFF;font-size:0.82em;font-weight:700;">{v}</span>
+    </div>'''
+    for k, v in _g["items"]
+)
+
+st.sidebar.markdown(f"""
+<div style="background:linear-gradient(135deg,#0A1A3F,#111933);
+            border:1px solid #00A3CC55; border-radius:14px;
+            padding:1rem 1.1rem 1rem 1.1rem; margin-top:0.8rem;">
+
+  <div style="display:flex;align-items:center;gap:10px;margin-bottom:0.8rem;">
+    <div style="background:linear-gradient(135deg,#00FFFF,#00A3CC);
+                color:#050C22;font-weight:900;font-size:0.7em;
+                padding:3px 10px;border-radius:6px;letter-spacing:1px;">
+      {_g["icono"]}
+    </div>
+    <span style="color:#FAFAFA;font-weight:700;font-size:0.95em;">{_g["titulo"]}</span>
+  </div>
+
+  {_items_html}
+
+  <div style="margin-top:0.8rem;background:#2A0A0A;border-left:3px solid #FF4444;
+              border-radius:6px;padding:6px 10px;font-size:0.78em;color:#FF8888;">
+    {_g["alerta"]}
+  </div>
+
+  <div style="margin-top:0.6rem;background:#0A1A2A;border-left:3px solid #00A3CC;
+              border-radius:6px;padding:5px 10px;font-size:0.77em;color:#B0B0B0;">
+    Filmar: <span style="color:#00FFFF;font-weight:700;">{_g["vistas"]}</span>
+  </div>
+</div>
+""", unsafe_allow_html=True)
 
 # ====== TITULO ======
-st.title("AlinIA - Fitness Form Analyzer")
-st.markdown("Analiza tu forma en ejercicios y recibe feedback automatico")
-st.warning("Esta herramienta es educativa. No reemplaza a un entrenador profesional.")
+# ===== HEADER CON LOGO =====
+import base64
+from pathlib import Path
+
+_logo_path = Path(__file__).parent / "logo.png"
+
+if _logo_path.exists():
+    # Logo real del proyecto
+    with open(_logo_path, "rb") as _lf:
+        _logo_b64 = base64.b64encode(_lf.read()).decode()
+    st.markdown(f"""
+    <div class="alinia-header">
+      <div class="alinia-logo">
+        <img src="data:image/png;base64,{_logo_b64}" width="170" height="170"
+             style="object-fit:contain; filter:drop-shadow(0 0 10px #00FFFF88);">
+      </div>
+      <div>
+        <div class="alinia-title">AlinIA</div>
+        <div class="alinia-subtitle">Tecnologia de Alineacion Inteligente</div>
+      </div>
+    </div>
+    """, unsafe_allow_html=True)
+else:
+    # Fallback: SVG inline mientras no existe logo.png
+    st.markdown("""
+    <div class="alinia-header">
+      <div class="alinia-logo">
+        <svg viewBox="0 0 120 115" width="90" height="90" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <filter id="glow-h"><feGaussianBlur stdDeviation="2.5" result="b"/>
+              <feMerge><feMergeNode in="b"/><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+            </filter>
+            <linearGradient id="g1" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#00FFFF"/><stop offset="100%" stop-color="#00A3CC"/>
+            </linearGradient>
+          </defs>
+          <line x1="8" y1="72" x2="112" y2="72" stroke="#00A3CC" stroke-width="3.5" filter="url(#glow-h)"/>
+          <rect x="5" y="62" width="11" height="20" rx="2" fill="none" stroke="#00FFFF" stroke-width="2" filter="url(#glow-h)"/>
+          <rect x="104" y="62" width="11" height="20" rx="2" fill="none" stroke="#00FFFF" stroke-width="2" filter="url(#glow-h)"/>
+          <circle cx="82" cy="22" r="9" fill="none" stroke="#00FFFF" stroke-width="2.2" filter="url(#glow-h)"/>
+          <line x1="80" y1="31" x2="46" y2="58" stroke="url(#g1)" stroke-width="3" stroke-linecap="round" filter="url(#glow-h)"/>
+          <line x1="76" y1="40" x2="56" y2="72" stroke="#00FFFF" stroke-width="2" filter="url(#glow-h)"/>
+          <circle cx="46" cy="58" r="3.5" fill="#00FFFF" filter="url(#glow-h)"/>
+          <line x1="46" y1="58" x2="34" y2="84" stroke="url(#g1)" stroke-width="2.8" stroke-linecap="round" filter="url(#glow-h)"/>
+          <line x1="34" y1="84" x2="28" y2="106" stroke="#00FFFF" stroke-width="2.5" filter="url(#glow-h)"/>
+          <line x1="46" y1="58" x2="60" y2="84" stroke="url(#g1)" stroke-width="2.8" stroke-linecap="round" filter="url(#glow-h)"/>
+          <line x1="60" y1="84" x2="62" y2="106" stroke="#00FFFF" stroke-width="2.5" filter="url(#glow-h)"/>
+          <circle cx="34" cy="84" r="3" fill="#00A3CC" filter="url(#glow-h)"/>
+          <circle cx="60" cy="84" r="3" fill="#00A3CC" filter="url(#glow-h)"/>
+          <line x1="28" y1="106" x2="16" y2="106" stroke="#00FFFF" stroke-width="2.5" stroke-linecap="round" filter="url(#glow-h)"/>
+          <line x1="62" y1="106" x2="76" y2="106" stroke="#00FFFF" stroke-width="2.5" stroke-linecap="round" filter="url(#glow-h)"/>
+        </svg>
+      </div>
+      <div>
+        <div class="alinia-title">AlinIA</div>
+        <div class="alinia-subtitle">Tecnologia de Alineacion Inteligente</div>
+      </div>
+    </div>
+    """, unsafe_allow_html=True)
+
+st.markdown("""<div style="height:1px; background:linear-gradient(90deg,transparent,#00A3CC,transparent); margin-bottom:1.2rem;"></div>""",
+            unsafe_allow_html=True)
+
+st.markdown("""
+<div style="background:#111933; border:1px solid #00A3CC33; border-radius:12px;
+            padding:10px 18px; margin-bottom:1rem; color:#B0B0B0; font-size:0.88em;
+            display:flex; align-items:center; gap:10px;">
+  <span style="color:#FFB300; font-size:1.1em; font-weight:bold;">!</span>
+  Herramienta educativa — no reemplaza la consulta con un entrenador profesional.
+</div>
+""", unsafe_allow_html=True)
 
 # ====== TABS ======
 tab1, tab2, tab3 = st.tabs(["Procesar Video", "Procesar Imagen", "Rangos de Referencia"])
@@ -272,16 +596,20 @@ tab1, tab2, tab3 = st.tabs(["Procesar Video", "Procesar Imagen", "Rangos de Refe
 # ---------- TAB 1: VIDEO ----------
 with tab1:
     st.header("Analizar Video")
+    st.markdown("Sube **dos videos**: uno lateral y otro de frente para un analisis completo.")
+
+    # ---- SECCION 1: LATERAL ----
+    st.markdown('''<div class="view-header">
+      <span class="view-badge">LATERAL</span>
+      <span class="view-desc">Vista de perfil — mide angulos de rodilla, cadera y espalda con precision</span>
+    </div>''', unsafe_allow_html=True)
 
     video_file = st.file_uploader(
-        "Sube un video de tu ejercicio",
+        "Video de LATERAL (perfil)",
         type=['mp4', 'avi', 'mov', 'mkv'],
-        help="Maximo 200 MB. Filma de PERFIL (vista lateral) para mejor precision"
+        help="Filma desde el lado — cuerpo completo visible",
+        key="video_lateral"
     )
-
-    st.info("Graba el video de PERFIL (vista lateral). "
-              "El cuerpo debe estar completamente visible de lado para medir "
-              "angulos de rodilla, cadera y espalda con precision.")
 
     if video_file is not None:
         temp_dir       = tempfile.mkdtemp()
@@ -423,15 +751,13 @@ with tab1:
 
     # ---- VIDEO FRENTE ----
     st.markdown("---")
-    st.subheader("2. Vista de Frente")
-
-    if selected_exercise == 'squat':
-        front_hint_v = "Sube un video de frente para verificar ancho de pies, alineacion de rodillas y nivel de caderas."
-    elif selected_exercise == 'pushup':
-        front_hint_v = "Sube un video de frente para verificar ancho de manos y nivel de hombros."
-    else:
-        front_hint_v = "Sube un video de frente para verificar ancho de pies vs caderas y nivel de caderas."
-    st.info(front_hint_v)
+    front_hints_v = {
+        'squat':    "Verifica ancho de pies, alineacion de rodillas y nivel de caderas",
+        'pushup':   "Verifica ancho de manos y nivel de hombros",
+        'deadlift': "Verifica ancho de pies vs caderas y nivel durante el levantamiento",
+    }
+    st.markdown(f'''<div class="view-header"><span class="view-badge">FRENTE</span>
+     <span class="view-desc">{front_hints_v.get(selected_exercise, "")}</span></div>''', unsafe_allow_html=True)
 
     video_file_front = st.file_uploader(
         "Video de FRENTE",
@@ -509,7 +835,8 @@ with tab2:
 
     # ---- SECCION 1: PERFIL ----
     st.markdown("---")
-    st.subheader("1. Vista de Perfil (lateral)")
+    st.markdown('''<div class="view-header"><span class="view-badge">PERFIL</span>
+     <span class="view-desc">Vista lateral — mide angulos de rodilla, cadera y espalda con precision</span></div>''', unsafe_allow_html=True)
     st.info("Filmado desde el lado — permite medir angulos de rodilla, cadera y espalda.")
 
     image_file = st.file_uploader(
@@ -556,15 +883,13 @@ with tab2:
 
     # ---- SECCION 2: FRENTE ----
     st.markdown("---")
-    st.subheader("2. Vista de Frente")
-
-    if selected_exercise == 'squat':
-        front_hint = "Permite verificar ancho de pies vs hombros y alineacion de rodillas."
-    elif selected_exercise == 'pushup':
-        front_hint = "Permite verificar ancho de manos vs hombros y nivel de hombros."
-    else:
-        front_hint = "Permite verificar ancho de pies vs caderas y nivel de caderas/hombros."
-    st.info(front_hint)
+    front_hints = {
+        'squat':    "Verifica ancho de pies vs hombros y alineacion de rodillas",
+        'pushup':   "Verifica ancho de manos vs hombros y nivel de hombros",
+        'deadlift': "Verifica ancho de pies vs caderas y nivel de caderas/hombros",
+    }
+    st.markdown(f'''<div class="view-header"><span class="view-badge">FRENTE</span>
+     <span class="view-desc">{front_hints.get(selected_exercise, "")}</span></div>''', unsafe_allow_html=True)
 
     image_file_front = st.file_uploader(
         "Imagen de FRENTE",
