@@ -2,19 +2,18 @@ venv/
 __pycache__/
 *.pyc
 *.pyo
+
+# Videos
 *.mp4
 *.avi
 *.mov
 *.mkv
+
+# Imagenes de prueba y salidas (mantener solo logo)
 *.jpg
 *.jpeg
 *.png
-!logo.png
+!assets/logo.png
+
+# Datos de prueba generados
 *.json
-grafico_scores.png
-resultado*.jpg
-sentadillas.jpg
-pose.png
-squat_test.mp4
-video_procesado.mp4
-estadisticas.json

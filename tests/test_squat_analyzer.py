@@ -20,7 +20,7 @@ Duración: ~2 minutos por imagen
 
 import cv2
 import numpy as np
-from pose_analyzer import SquatAnalyzer
+from src.pose_analyzer import SquatAnalyzer
 
 # ====== CONFIGURACIÓN ======
 IMAGE_PATH = "sentadillas.jpg"  

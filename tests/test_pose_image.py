@@ -16,7 +16,7 @@ Duración: ~2 minutos por imagen
 """
 
 import cv2
-from pose_analyzer import PoseAnalyzer
+from src.pose_analyzer import PoseAnalyzer
 
 # ====== CONFIGURACIÓN ======
 IMAGE_PATH = "pose.png"  # 

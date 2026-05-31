@@ -1,5 +1,5 @@
 """
-streamlit_fitness_app.py
+app.py
 App Streamlit para analisis de forma en ejercicios - AlinIA
 """
 
@@ -12,7 +12,7 @@ from collections import Counter
 import re
 import numpy as np
 import plotly.graph_objects as go
-from pose_analyzer import PoseAnalyzer, SquatAnalyzer, PushupAnalyzer, DeadliftAnalyzer, FrontViewAnalyzer
+from src.pose_analyzer import PoseAnalyzer, SquatAnalyzer, PushupAnalyzer, DeadliftAnalyzer, FrontViewAnalyzer
 
 # ====== CONFIG ======
 st.set_page_config(
@@ -522,7 +522,7 @@ st.sidebar.markdown(f"""
 import base64
 from pathlib import Path
 
-_logo_path = Path(__file__).parent / "logo.png"
+_logo_path = Path(__file__).parent / "assets" / "logo.png"
 
 if _logo_path.exists():
     # Logo real del proyecto
@@ -601,7 +601,7 @@ with tab1:
     # ---- SECCION 1: LATERAL ----
     st.markdown('''<div class="view-header">
       <span class="view-badge">LATERAL</span>
-      <span class="view-desc">Vista de perfil — mide angulos de rodilla, cadera y espalda con precision</span>
+      <span class="view-desc">Mide angulos de rodilla, cadera y espalda con precision</span>
     </div>''', unsafe_allow_html=True)
 
     video_file = st.file_uploader(
@@ -836,7 +836,7 @@ with tab2:
     # ---- SECCION 1: PERFIL ----
     st.markdown("---")
     st.markdown('''<div class="view-header"><span class="view-badge">PERFIL</span>
-     <span class="view-desc">Vista lateral — mide angulos de rodilla, cadera y espalda con precision</span></div>''', unsafe_allow_html=True)
+     <span class="view-desc">Mide angulos de rodilla, cadera y espalda con precision</span></div>''', unsafe_allow_html=True)
     st.info("Filmado desde el lado — permite medir angulos de rodilla, cadera y espalda.")
 
     image_file = st.file_uploader(

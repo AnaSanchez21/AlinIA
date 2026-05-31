@@ -14,7 +14,7 @@ Duración: ~2 minutos por imagen
 import cv2
 import numpy as np
 from math import degrees, acos
-from pose_analyzer import PoseAnalyzer
+from src.pose_analyzer import PoseAnalyzer
 
 # ====== CONFIGURACIÓN ======
 IMAGE_PATH = "tu_foto.jpg"  #  CAMBIA ESTO

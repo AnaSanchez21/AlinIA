@@ -27,7 +27,7 @@ import numpy as np
 import argparse
 import json
 from pathlib import Path
-from pose_analyzer import SquatAnalyzer, PushupAnalyzer, DeadliftAnalyzer
+from src.pose_analyzer import SquatAnalyzer, PushupAnalyzer, DeadliftAnalyzer
 import matplotlib.pyplot as plt
 from datetime import datetime
 
