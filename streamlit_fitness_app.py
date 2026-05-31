@@ -12,7 +12,7 @@ from collections import Counter
 import re
 import numpy as np
 import plotly.graph_objects as go
-from pose_analyzer import PoseAnalyzer, SquatAnalyzer, PushupAnalyzer, DeadliftAnalyzer
+from pose_analyzer import PoseAnalyzer, SquatAnalyzer, PushupAnalyzer, DeadliftAnalyzer, FrontViewAnalyzer
 
 # ====== CONFIG ======
 st.set_page_config(
@@ -276,8 +276,12 @@ with tab1:
     video_file = st.file_uploader(
         "Sube un video de tu ejercicio",
         type=['mp4', 'avi', 'mov', 'mkv'],
-        help="Maximo 200 MB. Cuerpo completo visible, buena iluminacion"
+        help="Maximo 200 MB. Filma de PERFIL (vista lateral) para mejor precision"
     )
+
+    st.info("Graba el video de PERFIL (vista lateral). "
+              "El cuerpo debe estar completamente visible de lado para medir "
+              "angulos de rodilla, cadera y espalda con precision.")
 
     if video_file is not None:
         temp_dir       = tempfile.mkdtemp()
@@ -417,19 +421,107 @@ with tab1:
         )
         st.plotly_chart(fig, use_container_width=True)
 
+    # ---- VIDEO FRENTE ----
+    st.markdown("---")
+    st.subheader("2. Vista de Frente")
+
+    if selected_exercise == 'squat':
+        front_hint_v = "Sube un video de frente para verificar ancho de pies, alineacion de rodillas y nivel de caderas."
+    elif selected_exercise == 'pushup':
+        front_hint_v = "Sube un video de frente para verificar ancho de manos y nivel de hombros."
+    else:
+        front_hint_v = "Sube un video de frente para verificar ancho de pies vs caderas y nivel de caderas."
+    st.info(front_hint_v)
+
+    video_file_front = st.file_uploader(
+        "Video de FRENTE",
+        type=['mp4', 'avi', 'mov', 'mkv'],
+        help="De frente a la camara, cuerpo completo visible",
+        key="video_frente"
+    )
+
+    if video_file_front is not None:
+        temp_dir_f   = tempfile.mkdtemp()
+        temp_input_f = os.path.join(temp_dir_f, "input_front.mp4")
+        temp_raw_f   = os.path.join(temp_dir_f, "output_front_raw.mp4")
+        temp_out_f   = os.path.join(temp_dir_f, "output_front.mp4")
+
+        with open(temp_input_f, "wb") as fv:
+            fv.write(video_file_front.getbuffer())
+
+        cap_f        = cv2.VideoCapture(temp_input_f)
+        fps_f        = cap_f.get(cv2.CAP_PROP_FPS) or 30
+        width_f      = int(cap_f.get(cv2.CAP_PROP_FRAME_WIDTH))
+        height_f     = int(cap_f.get(cv2.CAP_PROP_FRAME_HEIGHT))
+        total_f      = int(cap_f.get(cv2.CAP_PROP_FRAME_COUNT))
+
+        front_analyzer = FrontViewAnalyzer()
+        fa_core        = front_analyzer.analyzer
+
+        fourcc_f = cv2.VideoWriter_fourcc(*'avc1')
+        out_f    = cv2.VideoWriter(temp_raw_f, fourcc_f, fps_f, (width_f, height_f))
+        if not out_f.isOpened():
+            fourcc_f = cv2.VideoWriter_fourcc(*'mp4v')
+            out_f    = cv2.VideoWriter(temp_raw_f, fourcc_f, fps_f, (width_f, height_f))
+
+        fb_counter_f = Counter()
+        frames_f     = 0
+        prog_f       = st.progress(0)
+
+        try:
+            while cap_f.isOpened():
+                ret_f, frm_f = cap_f.read()
+                if not ret_f:
+                    break
+                frames_f += 1
+                res_f = fa_core.detect_pose(frm_f)
+                if res_f.pose_landmarks:
+                    lm_f     = res_f.pose_landmarks.landmark
+                    ana_f    = front_analyzer.analyze(frm_f, lm_f, selected_exercise)
+                    frm_f    = fa_core.draw_skeleton(frm_f, lm_f)
+                    for fb in ana_f['feedback']:
+                        key_f = re.sub(r'\s*\(-?[\d.]+x[^)]*\)', '', fb).strip()
+                        fb_counter_f[key_f] += 1
+                out_f.write(frm_f)
+                if total_f > 0:
+                    prog_f.progress(frames_f / total_f)
+        finally:
+            cap_f.release()
+            out_f.release()
+
+        prog_f.empty()
+
+        video_front_show = reencode_for_browser(temp_raw_f, temp_out_f)
+
+        col_fv, col_fr = st.columns([3, 2])
+        with col_fv:
+            st.subheader("Video de frente con skeleton")
+            st.video(video_front_show)
+        with col_fr:
+            st.markdown("**Feedback de frente**")
+            st.caption(f"Basado en {frames_f} frames")
+            feedback_cards_with_freq(fb_counter_f, frames_f)
+
 # ---------- TAB 2: IMAGEN ----------
 with tab2:
     st.header("Analizar Imagen Estatica")
+    st.markdown("Sube **dos imagenes**: una de perfil y otra de frente para un analisis completo.")
+
+    # ---- SECCION 1: PERFIL ----
+    st.markdown("---")
+    st.subheader("1. Vista de Perfil (lateral)")
+    st.info("Filmado desde el lado — permite medir angulos de rodilla, cadera y espalda.")
 
     image_file = st.file_uploader(
-        "Sube una imagen de tu ejercicio",
+        "Imagen de PERFIL",
         type=['jpg', 'jpeg', 'png'],
-        help="JPG o PNG. Maximo 10 MB. Cuerpo completo visible"
+        help="JPG o PNG. Cuerpo completo visible de lado",
+        key="img_perfil"
     )
 
     if image_file is not None:
         temp_dir   = tempfile.mkdtemp()
-        temp_image = os.path.join(temp_dir, "image.jpg")
+        temp_image = os.path.join(temp_dir, "image_perfil.jpg")
 
         with open(temp_image, "wb") as f:
             f.write(image_file.getbuffer())
@@ -449,22 +541,66 @@ with tab2:
         if results.pose_landmarks:
             landmarks = results.pose_landmarks.landmark
             analysis  = exercise_analyzer.analyze(frame, landmarks)
-
-            frame = analyzer.draw_skeleton(frame, landmarks)
+            frame     = analyzer.draw_skeleton(frame, landmarks)
 
             col1, col2 = st.columns([2, 1])
-
             with col1:
                 st.image(cv2.cvtColor(frame, cv2.COLOR_BGR2RGB), use_column_width=True)
-
             with col2:
                 score_gauge(analysis['overall_score'])
                 st.markdown("<br>", unsafe_allow_html=True)
-                st.markdown("**Feedback detallado**")
+                st.markdown("**Feedback de perfil**")
                 feedback_cards(analysis['feedback'])
         else:
-            st.error("No se pudo detectar pose. Intenta con otra imagen mas clara "
-                     "(buena iluminacion, cuerpo completo visible).")
+            st.error("No se pudo detectar pose. Asegurate de estar de perfil con cuerpo completo visible.")
+
+    # ---- SECCION 2: FRENTE ----
+    st.markdown("---")
+    st.subheader("2. Vista de Frente")
+
+    if selected_exercise == 'squat':
+        front_hint = "Permite verificar ancho de pies vs hombros y alineacion de rodillas."
+    elif selected_exercise == 'pushup':
+        front_hint = "Permite verificar ancho de manos vs hombros y nivel de hombros."
+    else:
+        front_hint = "Permite verificar ancho de pies vs caderas y nivel de caderas/hombros."
+    st.info(front_hint)
+
+    image_file_front = st.file_uploader(
+        "Imagen de FRENTE",
+        type=['jpg', 'jpeg', 'png'],
+        help="JPG o PNG. De frente a la camara, cuerpo completo visible",
+        key="img_frente"
+    )
+
+    if image_file_front is not None:
+        temp_dir2   = tempfile.mkdtemp()
+        temp_image2 = os.path.join(temp_dir2, "image_frente.jpg")
+
+        with open(temp_image2, "wb") as f:
+            f.write(image_file_front.getbuffer())
+
+        frame2 = cv2.imread(temp_image2)
+        front_analyzer = FrontViewAnalyzer()
+        fa_core        = front_analyzer.analyzer
+        results2       = fa_core.detect_pose(frame2)
+
+        if results2.pose_landmarks:
+            landmarks2 = results2.pose_landmarks.landmark
+            analysis2  = front_analyzer.analyze(frame2, landmarks2, selected_exercise)
+            frame2     = fa_core.draw_skeleton(frame2, landmarks2)
+
+            col1, col2 = st.columns([2, 1])
+            with col1:
+                st.image(cv2.cvtColor(frame2, cv2.COLOR_BGR2RGB), use_column_width=True)
+            with col2:
+                score_gauge(analysis2['overall_score'])
+                st.markdown("<br>", unsafe_allow_html=True)
+                st.markdown("**Feedback de frente**")
+                feedback_cards(analysis2['feedback'])
+        else:
+            st.error("No se pudo detectar pose. Asegurate de estar de frente con cuerpo completo visible.")
+
 
 # ---------- TAB 3: RANGOS ----------
 with tab3:
