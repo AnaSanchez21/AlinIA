@@ -4,9 +4,12 @@ Modulo core para analisis de forma fisica en ejercicios.
 Disenado para videos tomados de PERFIL (lateral).
 """
 
+import os
 import cv2
 import mediapipe as mp
 import numpy as np
+import urllib.request
+import tempfile
 from math import acos, degrees
 from dataclasses import dataclass
 from typing import List, Tuple, Dict
@@ -19,18 +22,48 @@ class PoseLandmark:
     z: float
     visibility: float
 
+
+# ── Wrappers de compatibilidad (nueva API → formato antiguo) ───────────────────
+class _LandmarkList:
+    def __init__(self, landmarks):
+        self.landmark = landmarks   # lista de NormalizedLandmark
+
+class _DetectionResult:
+    def __init__(self, pose_landmarks_list):
+        if pose_landmarks_list:
+            self.pose_landmarks = _LandmarkList(pose_landmarks_list[0])
+        else:
+            self.pose_landmarks = None
+# ───────────────────────────────────────────────────────────────────────────────
+
+
 class PoseAnalyzer:
     """Analizador de poses corporales. Optimizado para vista de perfil."""
 
+    _MODEL_URL = (
+        "https://storage.googleapis.com/mediapipe-models/"
+        "pose_landmarker/pose_landmarker_full/float16/1/"
+        "pose_landmarker_full.task"
+    )
+
     def __init__(self):
-        self.mp_pose = mp.solutions.pose
-        self.pose = self.mp_pose.Pose(
-            static_image_mode=False,
-            model_complexity=1,
-            smooth_landmarks=True,
-            min_detection_confidence=0.7,
-            min_tracking_confidence=0.5
+        from mediapipe.tasks import python as _mp_python
+        from mediapipe.tasks.python import vision as _mp_vision
+
+        model_path = os.path.join(tempfile.gettempdir(), "pose_landmarker_full.task")
+        if not os.path.exists(model_path):
+            urllib.request.urlretrieve(self._MODEL_URL, model_path)
+
+        base_options = _mp_python.BaseOptions(model_asset_path=model_path)
+        options = _mp_vision.PoseLandmarkerOptions(
+            base_options=base_options,
+            running_mode=_mp_vision.RunningMode.IMAGE,
+            num_poses=1,
+            min_pose_detection_confidence=0.7,
+            min_pose_presence_confidence=0.5,
+            min_tracking_confidence=0.5,
         )
+        self._landmarker = _mp_vision.PoseLandmarker.create_from_options(options)
 
         self.LANDMARKS = {
             'nose': 0,
@@ -53,10 +86,11 @@ class PoseAnalyzer:
         }
 
     def detect_pose(self, frame):
-        """Detecta pose en frame RGB"""
-        rgb_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-        results = self.pose.process(rgb_frame)
-        return results
+        """Detecta pose en frame BGR. Devuelve objeto compatible con la API antigua."""
+        rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+        mp_image = mp.Image(image_format=mp.ImageFormat.SRGB, data=rgb)
+        result = self._landmarker.detect(mp_image)
+        return _DetectionResult(result.pose_landmarks)
 
     def get_landmark(self, landmarks, name):
         """Obtiene coordenadas de un landmark especifico"""
