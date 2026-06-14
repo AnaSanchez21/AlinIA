@@ -709,7 +709,8 @@ with tab1:
 
         with col_video:
             st.subheader("Video con skeleton")
-            st.video(video_to_show)
+            with open(video_to_show, 'rb') as _vf:
+                st.video(_vf.read())
 
         with col_results:
             avg_score = float(np.mean(scores)) if scores else 0
@@ -822,7 +823,8 @@ with tab1:
         col_fv, col_fr = st.columns([3, 2])
         with col_fv:
             st.subheader("Video de frente con skeleton")
-            st.video(video_front_show)
+            with open(video_front_show, 'rb') as _vf:
+                st.video(_vf.read())
         with col_fr:
             st.markdown("**Feedback de frente**")
             st.caption(f"Basado en {frames_f} frames")
