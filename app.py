@@ -712,8 +712,11 @@ with tab1:
 
         with col_video:
             st.subheader("Video con skeleton")
-            with open(video_to_show, 'rb') as _vf:
-                st.video(_vf.read())
+            if os.path.exists(video_to_show) and os.path.getsize(video_to_show) > 1000:
+                with open(video_to_show, 'rb') as _vf:
+                    st.video(_vf.read())
+            else:
+                st.error(f"Error al generar video. Path: {video_to_show} | Existe: {os.path.exists(video_to_show)} | Tamaño: {os.path.getsize(video_to_show) if os.path.exists(video_to_show) else 'N/A'}")
 
         with col_results:
             avg_score = float(np.mean(scores)) if scores else 0
