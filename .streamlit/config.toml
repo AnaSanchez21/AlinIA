@@ -1,6 +1,7 @@
 [server]
 maxUploadSize = 200
 enableCORS = false
+enableXsrfProtection = false
 
 [theme]
 base = "dark"
