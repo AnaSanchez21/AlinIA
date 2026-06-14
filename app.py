@@ -384,16 +384,18 @@ def reencode_for_browser(input_path, output_path):
     Metodo 2: imageio con plugin ffmpeg
     Retorna el path del video que se puede reproducir.
     """
-    # Metodo 1: ffmpeg en PATH (Windows/Mac/Linux)
+    # Metodo 1: ffmpeg en PATH — software libx264, dimensiones divisibles por 2
     for cmd in ['ffmpeg', 'ffmpeg.exe']:
         try:
             result = subprocess.run([
                 cmd, '-y', '-i', input_path,
-                '-vcodec', 'libx264', '-crf', '23',
+                '-vcodec', 'libx264', '-crf', '28',
+                '-preset', 'ultrafast',
                 '-pix_fmt', 'yuv420p',
+                '-vf', 'scale=trunc(iw/2)*2:trunc(ih/2)*2',
                 '-movflags', '+faststart',
                 output_path
-            ], capture_output=True, timeout=180)
+            ], capture_output=True, timeout=300)
             if result.returncode == 0 and os.path.getsize(output_path) > 1000:
                 return output_path
         except (FileNotFoundError, Exception):
@@ -624,11 +626,12 @@ with tab1:
 
         cap          = cv2.VideoCapture(temp_input)
         fps          = cap.get(cv2.CAP_PROP_FPS) or 30
-        width        = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
-        height       = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
-        # H.264 requiere dimensiones pares
-        width        = width if width % 2 == 0 else width - 1
-        height       = height if height % 2 == 0 else height - 1
+        orig_w       = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
+        orig_h       = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
+        # Reducir resolución para ahorrar memoria (max 720px en el lado mayor)
+        scale        = min(1.0, 720 / max(orig_w, orig_h))
+        width        = int(orig_w * scale) & ~1   # par
+        height       = int(orig_h * scale) & ~1   # par
         total_frames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
 
         if selected_exercise == 'squat':
@@ -662,6 +665,8 @@ with tab1:
                     break
 
                 frame_count += 1
+                if scale < 1.0:
+                    frame = cv2.resize(frame, (width, height))
                 results = analyzer.detect_pose(frame)
 
                 if results.pose_landmarks:
@@ -784,11 +789,11 @@ with tab1:
 
         cap_f        = cv2.VideoCapture(temp_input_f)
         fps_f        = cap_f.get(cv2.CAP_PROP_FPS) or 30
-        width_f      = int(cap_f.get(cv2.CAP_PROP_FRAME_WIDTH))
-        height_f     = int(cap_f.get(cv2.CAP_PROP_FRAME_HEIGHT))
-        # H.264 requiere dimensiones pares
-        width_f      = width_f if width_f % 2 == 0 else width_f - 1
-        height_f     = height_f if height_f % 2 == 0 else height_f - 1
+        orig_wf      = int(cap_f.get(cv2.CAP_PROP_FRAME_WIDTH))
+        orig_hf      = int(cap_f.get(cv2.CAP_PROP_FRAME_HEIGHT))
+        scale_f      = min(1.0, 720 / max(orig_wf, orig_hf))
+        width_f      = int(orig_wf * scale_f) & ~1
+        height_f     = int(orig_hf * scale_f) & ~1
         total_f      = int(cap_f.get(cv2.CAP_PROP_FRAME_COUNT))
 
         front_analyzer = FrontViewAnalyzer()
@@ -810,6 +815,8 @@ with tab1:
                 if not ret_f:
                     break
                 frames_f += 1
+                if scale_f < 1.0:
+                    frm_f = cv2.resize(frm_f, (width_f, height_f))
                 res_f = fa_core.detect_pose(frm_f)
                 if res_f.pose_landmarks:
                     lm_f     = res_f.pose_landmarks.landmark
