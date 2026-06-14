@@ -626,6 +626,9 @@ with tab1:
         fps          = cap.get(cv2.CAP_PROP_FPS) or 30
         width        = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
         height       = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
+        # H.264 requiere dimensiones pares
+        width        = width if width % 2 == 0 else width - 1
+        height       = height if height % 2 == 0 else height - 1
         total_frames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
 
         if selected_exercise == 'squat':
@@ -780,6 +783,9 @@ with tab1:
         fps_f        = cap_f.get(cv2.CAP_PROP_FPS) or 30
         width_f      = int(cap_f.get(cv2.CAP_PROP_FRAME_WIDTH))
         height_f     = int(cap_f.get(cv2.CAP_PROP_FRAME_HEIGHT))
+        # H.264 requiere dimensiones pares
+        width_f      = width_f if width_f % 2 == 0 else width_f - 1
+        height_f     = height_f if height_f % 2 == 0 else height_f - 1
         total_f      = int(cap_f.get(cv2.CAP_PROP_FRAME_COUNT))
 
         front_analyzer = FrontViewAnalyzer()
